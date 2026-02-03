@@ -141,12 +141,23 @@ public class JsonDataStore
 
     private void EnsureSeedData()
     {
-        if (!File.Exists(_usersPath))
+        var users = Load<List<User>>(_usersPath) ?? new List<User>();
+        var usersUpdated = false;
+
+        void EnsureUser(string username, string password)
         {
-            var users = new List<User>
+            if (!users.Any(u => u.Username == username))
             {
-                new User { Username = "admin", Password = "admin123" }
-            };
+                users.Add(new User { Username = username, Password = password });
+                usersUpdated = true;
+            }
+        }
+
+        EnsureUser("admin", "admin123");
+        EnsureUser("test", "test");
+
+        if (!File.Exists(_usersPath) || usersUpdated)
+        {
             Save(_usersPath, users);
         }
 
