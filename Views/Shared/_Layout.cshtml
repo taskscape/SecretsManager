@@ -1,0 +1,35 @@
+@inject IHttpContextAccessor HttpContextAccessor
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Passwords</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header class="site-header">
+        <div class="brand">Passwords</div>
+        <nav class="nav">
+            @{
+                var user = HttpContextAccessor.HttpContext?.Session.GetString("username");
+            }
+            @if (!string.IsNullOrEmpty(user))
+            {
+                <span class="user">Signed in as @user</span>
+                <form method="post" asp-controller="Account" asp-action="Logout">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="link-button">Log out</button>
+                </form>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login">Log in</a>
+            }
+        </nav>
+    </header>
+    <main class="container">
+        @RenderBody()
+    </main>
+</body>
+</html>

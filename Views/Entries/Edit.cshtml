@@ -1,0 +1,26 @@
+@model EntryEditViewModel
+@{
+    ViewData["Title"] = "Edit Entry";
+}
+
+<div class="panel">
+    <h1>Edit Entry</h1>
+
+    <form method="post" asp-action="Edit">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <div class="field">
+            <label asp-for="Title">Entry title</label>
+            <input asp-for="Title" />
+            <span class="validation" asp-validation-for="Title"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Details">Entry details</label>
+            <textarea asp-for="Details" rows="12"></textarea>
+        </div>
+        <div class="actions">
+            <button type="submit" class="primary">Save changes</button>
+            <a asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
+        </div>
+    </form>
+</div>

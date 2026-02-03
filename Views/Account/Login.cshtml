@@ -1,0 +1,26 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="panel">
+    <h1>Login</h1>
+
+    @if (ViewData["Error"] is string error && !string.IsNullOrWhiteSpace(error))
+    {
+        <div class="alert">@error</div>
+    }
+
+    <form method="post" asp-action="Login" asp-controller="Account">
+        @Html.AntiForgeryToken()
+        <div class="field">
+            <label asp-for="Username">Username</label>
+            <input asp-for="Username" autocomplete="username" />
+        </div>
+        <div class="field">
+            <label asp-for="Password">Password</label>
+            <input asp-for="Password" type="password" autocomplete="current-password" />
+        </div>
+        <button type="submit" class="primary">Sign in</button>
+    </form>
+</div>

@@ -1,0 +1,14 @@
+@model Entry
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="page-header">
+    <h1>@Model.Title</h1>
+    <div class="header-actions">
+        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+        <a asp-action="Index">Back to list</a>
+    </div>
+</div>
+
+<pre class="entry-details">@Model.Details</pre>
