@@ -1,58 +1,54 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Passwords.Models;
-using Passwords.Services;
 
 namespace Passwords.Controllers;
 
 public class AccountController : Controller
 {
-    private readonly JsonDataStore _store;
-
-    public AccountController(JsonDataStore store)
-    {
-        _store = store;
-    }
-
     [HttpGet]
-    public IActionResult Login()
+    [AllowAnonymous]
+    public IActionResult Login(string? error = null)
     {
-        if (IsLoggedIn)
+        if (User.Identity?.IsAuthenticated == true)
         {
             return RedirectToAction("Index", "Entries");
         }
 
-        return View(new LoginViewModel());
+        return View(new LoginViewModel { Error = error });
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Login(LoginViewModel model)
+    [AllowAnonymous]
+    public IActionResult MicrosoftLogin(string? returnUrl = null)
     {
-        if (string.IsNullOrWhiteSpace(model.Username) || string.IsNullOrWhiteSpace(model.Password))
+        var redirectUrl = Url.IsLocalUrl(returnUrl)
+            ? returnUrl
+            : Url.Action("Index", "Entries") ?? "/";
+
+        var properties = new AuthenticationProperties
         {
-            ViewData["Error"] = "Username and password are required.";
-            return View(model);
-        }
+            RedirectUri = redirectUrl
+        };
 
-        if (!_store.ValidateUser(model.Username, model.Password))
-        {
-            ViewData["Error"] = "Invalid username or password.";
-            return View(model);
-        }
-
-        HttpContext.Session.SetString("username", model.Username);
-        _store.LogLogin(model.Username);
-
-        return RedirectToAction("Index", "Entries");
+        return Challenge(properties, OpenIdConnectDefaults.AuthenticationScheme);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Logout()
     {
-        HttpContext.Session.Clear();
-        return RedirectToAction("Login");
-    }
+        var properties = new AuthenticationProperties
+        {
+            RedirectUri = Url.Action("Login", "Account")
+        };
 
-    private bool IsLoggedIn => !string.IsNullOrEmpty(HttpContext.Session.GetString("username"));
+        return SignOut(properties,
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            OpenIdConnectDefaults.AuthenticationScheme);
+    }
 }

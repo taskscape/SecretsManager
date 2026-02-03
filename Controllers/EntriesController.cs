@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Passwords.Models;
 using Passwords.Services;
 
 namespace Passwords.Controllers;
 
+[Authorize]
 public class EntriesController : Controller
 {
     private readonly JsonDataStore _store;
@@ -16,11 +18,6 @@ public class EntriesController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        if (!IsLoggedIn)
-        {
-            return RedirectToLogin();
-        }
-
         var entries = _store.GetEntries()
             .OrderBy(e => e.Title, StringComparer.OrdinalIgnoreCase)
             .ToList();
@@ -31,11 +28,6 @@ public class EntriesController : Controller
     [HttpGet]
     public IActionResult Details(int id)
     {
-        if (!IsLoggedIn)
-        {
-            return RedirectToLogin();
-        }
-
         var entry = _store.GetEntry(id);
         if (entry == null)
         {
@@ -49,11 +41,6 @@ public class EntriesController : Controller
     [HttpGet]
     public IActionResult Create()
     {
-        if (!IsLoggedIn)
-        {
-            return RedirectToLogin();
-        }
-
         return View(new EntryCreateViewModel());
     }
 
@@ -61,11 +48,6 @@ public class EntriesController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Create(EntryCreateViewModel model)
     {
-        if (!IsLoggedIn)
-        {
-            return RedirectToLogin();
-        }
-
         if (string.IsNullOrWhiteSpace(model.Title))
         {
             ModelState.AddModelError(nameof(model.Title), "Title is required.");
@@ -79,11 +61,6 @@ public class EntriesController : Controller
     [HttpGet]
     public IActionResult Edit(int id)
     {
-        if (!IsLoggedIn)
-        {
-            return RedirectToLogin();
-        }
-
         var entry = _store.GetEntry(id);
         if (entry == null)
         {
@@ -104,11 +81,6 @@ public class EntriesController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Edit(EntryEditViewModel model)
     {
-        if (!IsLoggedIn)
-        {
-            return RedirectToLogin();
-        }
-
         if (string.IsNullOrWhiteSpace(model.Title))
         {
             ModelState.AddModelError(nameof(model.Title), "Title is required.");
@@ -124,9 +96,5 @@ public class EntriesController : Controller
         return RedirectToAction("Details", new { id = model.Id });
     }
 
-    private string CurrentUser => HttpContext.Session.GetString("username") ?? "";
-
-    private bool IsLoggedIn => !string.IsNullOrEmpty(CurrentUser);
-
-    private IActionResult RedirectToLogin() => RedirectToAction("Login", "Account");
+    private string CurrentUser => UserIdentifier.GetUserIdentifier(User) ?? "Unknown";
 }

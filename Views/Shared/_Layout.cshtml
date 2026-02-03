@@ -1,3 +1,4 @@
+@using Passwords.Services
 @inject IHttpContextAccessor HttpContextAccessor
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +13,8 @@
         <div class="brand">Passwords</div>
         <nav class="nav">
             @{
-                var user = HttpContextAccessor.HttpContext?.Session.GetString("username");
+                var principal = HttpContextAccessor.HttpContext?.User;
+                var user = UserIdentifier.GetUserIdentifier(principal);
             }
             @if (!string.IsNullOrEmpty(user))
             {
