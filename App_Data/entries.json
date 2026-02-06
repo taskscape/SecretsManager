@@ -1,7 +1,14 @@
 [
   {
-    "id": 1,
-    "title": "First Entry",
-    "details": "Replace this with real data."
+    "Id": 0,
+    "Title": "",
+    "Details": "",
+    "Users": null
+  },
+  {
+    "Id": 1,
+    "Title": "test",
+    "Details": "test",
+    "Users": "admin"
   }
 ]

@@ -51,6 +51,11 @@ public class JsonDataStore
 
     public Entry AddEntry(string title, string details, string user)
     {
+        return AddEntry(title, details, null, user);
+    }
+
+    public Entry AddEntry(string title, string details, string? users, string user)
+    {
         lock (_lock)
         {
             var entries = Load<List<Entry>>(_entriesPath) ?? new List<Entry>();
@@ -59,7 +64,8 @@ public class JsonDataStore
             {
                 Id = nextId,
                 Title = title,
-                Details = details
+                Details = details,
+                Users = users
             };
 
             entries.Add(entry);
@@ -79,6 +85,11 @@ public class JsonDataStore
 
     public bool UpdateEntry(int id, string title, string details, string user)
     {
+        return UpdateEntry(id, title, details, null, user);
+    }
+
+    public bool UpdateEntry(int id, string title, string details, string? users, string user)
+    {
         lock (_lock)
         {
             var entries = Load<List<Entry>>(_entriesPath) ?? new List<Entry>();
@@ -90,6 +101,7 @@ public class JsonDataStore
 
             entry.Title = title;
             entry.Details = details;
+            entry.Users = users;
             Save(_entriesPath, entries);
             LogAccess(new AccessLogEntry
             {
