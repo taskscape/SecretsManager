@@ -1,5 +1,6 @@
 [
   {
-    "username": "admin@contoso.com"
+    "username": "admin",
+    "password": "admin123"
   }
 ]
