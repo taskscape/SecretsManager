@@ -1,0 +1,9 @@
+{
+  "Authentication": {
+    "Microsoft": {
+      "ClientId": "production-client-id",
+      "ClientSecret": "production-client-secret",
+      "CallbackPath": "/signin-oidc"
+    }
+  }
+}

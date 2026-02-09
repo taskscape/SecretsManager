@@ -2,3 +2,13 @@
 bin
 obj
 *.user
+
+# User secrets (lokalne dane uwierzytelniania)
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.json
+
+# Produkcyjne dane użytkowników
+App_Data/users.json
+App_Data/entries.json
+App_Data/access.json

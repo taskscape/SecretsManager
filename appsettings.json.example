@@ -1,0 +1,16 @@
+{
+  "Authentication": {
+    "Microsoft": {
+      "ClientId": "your-client-id-from-azure",
+      "ClientSecret": "your-client-secret-from-azure",
+      "CallbackPath": "/signin-oidc"
+    }
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}
