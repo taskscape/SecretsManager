@@ -17,6 +17,11 @@
             <label asp-for="Details">Entry details</label>
             <textarea asp-for="Details" rows="10"></textarea>
         </div>
+        <div class="field">
+            <label asp-for="Users">Visible to (optional)</label>
+            <input asp-for="Users" placeholder="* for all, or comma-separated usernames" />
+            <span class="hint">Leave empty for default access, use "*" for all users, or list usernames separated by commas</span>
+        </div>
         <div class="actions">
             <button type="submit" class="primary">Create</button>
             <a asp-action="Index">Cancel</a>

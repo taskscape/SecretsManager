@@ -18,6 +18,11 @@
             <label asp-for="Details">Entry details</label>
             <textarea asp-for="Details" rows="12"></textarea>
         </div>
+        <div class="field">
+            <label asp-for="Users">Visible to (optional)</label>
+            <input asp-for="Users" placeholder="* for all, or comma-separated usernames" />
+            <span class="hint">Leave empty for default access, use "*" for all users, or list usernames separated by commas</span>
+        </div>
         <div class="actions">
             <button type="submit" class="primary">Save changes</button>
             <a asp-action="Details" asp-route-id="@Model.Id">Cancel</a>

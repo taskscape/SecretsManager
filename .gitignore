@@ -9,6 +9,4 @@ appsettings.Production.json
 appsettings.*.json
 
 # Produkcyjne dane użytkowników
-App_Data/users.json
-App_Data/entries.json
-App_Data/access.json
+App_Data/*.json

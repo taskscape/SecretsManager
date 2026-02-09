@@ -18,7 +18,9 @@ public class EntriesController : Controller
     [HttpGet]
     public IActionResult Index()
     {
+        var currentUser = CurrentUser;
         var entries = _store.GetEntries()
+            .Where(e => IsVisibleToUser(e, currentUser))
             .OrderBy(e => e.Title, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
@@ -54,7 +56,11 @@ public class EntriesController : Controller
             return View(model);
         }
 
-        var entry = _store.AddEntry(model.Title.Trim(), model.Details ?? string.Empty, CurrentUser);
+        var entry = _store.AddEntry(
+            model.Title.Trim(), 
+            model.Details ?? string.Empty, 
+            string.IsNullOrWhiteSpace(model.Users) ? null : model.Users.Trim(),
+            CurrentUser);
         return RedirectToAction("Details", new { id = entry.Id });
     }
 
@@ -71,7 +77,8 @@ public class EntriesController : Controller
         {
             Id = entry.Id,
             Title = entry.Title,
-            Details = entry.Details
+            Details = entry.Details,
+            Users = entry.Users
         };
 
         return View(model);
@@ -87,7 +94,12 @@ public class EntriesController : Controller
             return View(model);
         }
 
-        var updated = _store.UpdateEntry(model.Id, model.Title.Trim(), model.Details ?? string.Empty, CurrentUser);
+        var updated = _store.UpdateEntry(
+            model.Id, 
+            model.Title.Trim(), 
+            model.Details ?? string.Empty, 
+            string.IsNullOrWhiteSpace(model.Users) ? null : model.Users.Trim(),
+            CurrentUser);
         if (!updated)
         {
             return NotFound();
@@ -97,4 +109,25 @@ public class EntriesController : Controller
     }
 
     private string CurrentUser => UserIdentifier.GetUserIdentifier(User) ?? "Unknown";
+
+    private static bool IsVisibleToUser(Entry entry, string currentUser)
+    {
+        if (string.IsNullOrWhiteSpace(entry.Users))
+        {
+            return true;
+        }
+
+        var users = entry.Users.Trim();
+
+        if (users == "*")
+        {
+            return true;
+        }
+
+        var allowedUsers = users.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(u => u.Trim())
+            .ToList();
+
+        return allowedUsers.Any(u => string.Equals(u, currentUser, StringComparison.OrdinalIgnoreCase));
+    }
 }
