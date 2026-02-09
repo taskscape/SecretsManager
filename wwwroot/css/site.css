@@ -131,3 +131,8 @@ textarea {
     color: #b91c1c;
     font-size: 13px;
 }
+
+.muted {
+    color: #475569;
+    margin-top: 16px;
+}

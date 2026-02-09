@@ -5,6 +5,13 @@ namespace Passwords.Services;
 
 public class JsonDataStore
 {
+    private static readonly JsonSerializerOptions SerializerOptions = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNameCaseInsensitive = true
+    };
+
     private readonly object _lock = new();
     private readonly string _usersPath;
     private readonly string _entriesPath;
@@ -22,12 +29,18 @@ public class JsonDataStore
         EnsureSeedData();
     }
 
-    public bool ValidateUser(string username, string password)
+    public bool IsAllowedUser(string identifier)
     {
+        if (string.IsNullOrWhiteSpace(identifier))
+        {
+            return false;
+        }
+
+        var normalized = identifier.Trim();
         lock (_lock)
         {
             var users = Load<List<User>>(_usersPath) ?? new List<User>();
-            return users.Any(u => u.Username == username && u.Password == password);
+            return users.Any(u => string.Equals(u.Username, normalized, StringComparison.OrdinalIgnoreCase));
         }
     }
 
@@ -153,23 +166,12 @@ public class JsonDataStore
 
     private void EnsureSeedData()
     {
-        var users = Load<List<User>>(_usersPath) ?? new List<User>();
-        var usersUpdated = false;
-
-        void EnsureUser(string username, string password)
+        if (!File.Exists(_usersPath))
         {
-            if (!users.Any(u => u.Username == username))
+            var users = new List<User>
             {
-                users.Add(new User { Username = username, Password = password });
-                usersUpdated = true;
-            }
-        }
-
-        EnsureUser("admin", "admin123");
-        EnsureUser("test", "test");
-
-        if (!File.Exists(_usersPath) || usersUpdated)
-        {
+                new User { Username = "admin@contoso.com" }
+            };
             Save(_usersPath, users);
         }
 
@@ -206,15 +208,12 @@ public class JsonDataStore
             return default;
         }
 
-        return JsonSerializer.Deserialize<T>(json);
+        return JsonSerializer.Deserialize<T>(json, SerializerOptions);
     }
 
     private static void Save<T>(string path, T data)
     {
-        var json = JsonSerializer.Serialize(data, new JsonSerializerOptions
-        {
-            WriteIndented = true
-        });
+        var json = JsonSerializer.Serialize(data, SerializerOptions);
         File.WriteAllText(path, json);
     }
 }

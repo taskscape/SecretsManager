@@ -6,21 +6,14 @@
 <div class="panel">
     <h1>Login</h1>
 
-    @if (ViewData["Error"] is string error && !string.IsNullOrWhiteSpace(error))
+    @if (!string.IsNullOrWhiteSpace(Model?.Error))
     {
-        <div class="alert">@error</div>
+        <div class="alert">@Model.Error</div>
     }
 
-    <form method="post" asp-action="Login" asp-controller="Account">
+    <form method="post" asp-action="MicrosoftLogin" asp-controller="Account">
         @Html.AntiForgeryToken()
-        <div class="field">
-            <label asp-for="Username">Username</label>
-            <input asp-for="Username" autocomplete="username" />
-        </div>
-        <div class="field">
-            <label asp-for="Password">Password</label>
-            <input asp-for="Password" type="password" autocomplete="current-password" />
-        </div>
-        <button type="submit" class="primary">Sign in</button>
+        <button type="submit" class="primary">Sign in with Microsoft</button>
     </form>
+    <p class="muted">Access is limited to accounts listed in App_Data/users.json.</p>
 </div>
