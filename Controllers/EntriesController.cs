@@ -144,7 +144,6 @@ public class EntriesController : Controller
 
     private static bool IsVisibleToUser(Entry entry, string currentUser)
     {
-        // Jeœli Users nie jest ustawione, wpis jest widoczny (domyœlne zachowanie)
         if (string.IsNullOrWhiteSpace(entry.Users))
         {
             return true;
@@ -152,13 +151,11 @@ public class EntriesController : Controller
 
         var users = entry.Users.Trim();
 
-        // Jeœli ustawiono "*", wpis jest widoczny dla wszystkich
         if (users == "*")
         {
             return true;
         }
 
-        // SprawdŸ czy bie¿¹cy u¿ytkownik jest na liœcie
         var allowedUsers = users.Split(',', StringSplitOptions.RemoveEmptyEntries)
             .Select(u => u.Trim())
             .ToList();
