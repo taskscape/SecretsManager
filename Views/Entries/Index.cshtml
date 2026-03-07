@@ -50,7 +50,7 @@ else
         {
             <li>
                 <a class="entry-item" asp-action="Details" asp-route-id="@entry.Id" data-title="@entry.Title.ToLower()">
-                    <div class="entry-icon">@entry.Title[0].ToString().ToUpper()</div>
+                    <div class="entry-icon">@(entry.Title.Length > 0 ? entry.Title[0].ToString().ToUpper() : "?")</div>
                     <div class="entry-info">
                         <div class="entry-title">@entry.Title</div>
                         <div class="entry-meta">Click to view details</div>
