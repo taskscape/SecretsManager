@@ -1,35 +1,130 @@
 @inject IHttpContextAccessor HttpContextAccessor
+@{
+    var user = HttpContextAccessor.HttpContext?.Session.GetString("username");
+    var isLoggedIn = !string.IsNullOrEmpty(user);
+    var avatarLetter = isLoggedIn ? user![0].ToString().ToUpper() : "";
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Passwords</title>
+    <title>@ViewData["Title"] - Vault</title>
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    <header class="site-header">
-        <div class="brand">Passwords</div>
-        <nav class="nav">
-            @{
-                var user = HttpContextAccessor.HttpContext?.Session.GetString("username");
-            }
-            @if (!string.IsNullOrEmpty(user))
-            {
-                <span class="user">Signed in as @user</span>
+
+@if (isLoggedIn)
+{
+    <!-- Mobile top bar -->
+    <header class="mobile-header" id="mobileHeader">
+        <div class="mobile-brand">
+            <div class="mobile-brand-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                </svg>
+            </div>
+            Vault
+        </div>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+        </button>
+    </header>
+
+    <!-- Sidebar overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="app-shell">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <a class="sidebar-logo" asp-controller="Entries" asp-action="Index">
+                <div class="sidebar-logo-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                    </svg>
+                </div>
+                <span class="sidebar-logo-text">Vault</span>
+            </a>
+
+            <nav class="sidebar-nav">
+                <a class="sidebar-nav-item active" asp-controller="Entries" asp-action="Index">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                    </svg>
+                    All entries
+                </a>
+                <a class="sidebar-nav-item" asp-controller="Entries" asp-action="Create">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="16"/>
+                        <line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                    New entry
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-avatar">@avatarLetter</div>
+                    <div>
+                        <div class="sidebar-username">@user</div>
+                        <div class="sidebar-username-label">Signed in</div>
+                    </div>
+                </div>
                 <form method="post" asp-controller="Account" asp-action="Logout">
                     @Html.AntiForgeryToken()
-                    <button type="submit" class="link-button">Log out</button>
+                    <button type="submit" class="link-button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        Sign out
+                    </button>
                 </form>
+            </div>
+        </aside>
+
+        <!-- Main -->
+        <div class="main-content">
+            <div class="page-body">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebarOverlay');
+            var hamburger = document.getElementById('hamburgerBtn');
+
+            function openSidebar() {
+                sidebar.classList.add('open');
+                overlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
             }
-            else
-            {
-                <a asp-controller="Account" asp-action="Login">Log in</a>
+
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('open');
+                document.body.style.overflow = '';
             }
-        </nav>
-    </header>
-    <main class="container">
-        @RenderBody()
-    </main>
+
+            if (hamburger) hamburger.addEventListener('click', openSidebar);
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+        })();
+    </script>
+}
+else
+{
+    @RenderBody()
+}
+
 </body>
 </html>

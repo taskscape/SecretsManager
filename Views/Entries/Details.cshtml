@@ -3,12 +3,34 @@
     ViewData["Title"] = Model.Title;
 }
 
-<div class="page-header">
-    <h1>@Model.Title</h1>
-    <div class="header-actions">
-        <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
-        <a asp-action="Index">Back to list</a>
-    </div>
+<div class="page-heading">
+    <a class="btn btn-ghost" asp-action="Index" style="margin-bottom:4px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        All entries
+    </a>
 </div>
 
-<pre class="entry-details">@Model.Details</pre>
+<div class="detail-card">
+    <div class="detail-header">
+        <div class="detail-header-icon">@Model.Title[0].ToString().ToUpper()</div>
+        <div class="detail-header-info">
+            <h1>@Model.Title</h1>
+            <div class="detail-id">Entry #@Model.Id</div>
+        </div>
+        <div class="detail-header-actions">
+            <a class="btn btn-ghost" asp-action="Edit" asp-route-id="@Model.Id">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Edit
+            </a>
+        </div>
+    </div>
+    <div class="detail-body">
+        <div class="detail-label">Stored secret</div>
+        <pre class="detail-content">@Model.Details</pre>
+    </div>
+</div>

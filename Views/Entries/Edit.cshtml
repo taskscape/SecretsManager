@@ -3,29 +3,45 @@
     ViewData["Title"] = "Edit Entry";
 }
 
-<div class="panel">
-    <h1>Edit Entry</h1>
+<div class="page-heading">
+    <div>
+        <h1>Edit entry</h1>
+        <p class="subtitle">Update the details for this entry</p>
+    </div>
+    <a class="btn btn-ghost" asp-action="Details" asp-route-id="@Model.Id">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Cancel
+    </a>
+</div>
 
+<div class="card">
     <form method="post" asp-action="Edit">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" />
         <div class="field">
             <label asp-for="Title">Entry title</label>
             <input asp-for="Title" />
-            <span class="validation" asp-validation-for="Title"></span>
+            <span class="validation-msg" asp-validation-for="Title"></span>
         </div>
         <div class="field">
             <label asp-for="Details">Entry details</label>
             <textarea asp-for="Details" rows="12"></textarea>
         </div>
         <div class="field">
-            <label asp-for="Users">Visible to (optional)</label>
+            <label asp-for="Users">Visible to <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--color-muted)">(optional)</span></label>
             <input asp-for="Users" placeholder="* for all, or comma-separated usernames" />
-            <span class="hint">Leave empty for default access, use "*" for all users, or list usernames separated by commas</span>
+            <span class="field-hint">Leave empty for default access, use <code>*</code> for all users, or list usernames separated by commas.</span>
         </div>
-        <div class="actions">
-            <button type="submit" class="primary">Save changes</button>
-            <a asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Save changes
+            </button>
+            <a class="btn btn-ghost" asp-action="Details" asp-route-id="@Model.Id">Cancel</a>
         </div>
     </form>
 </div>
