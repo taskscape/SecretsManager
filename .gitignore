@@ -4,3 +4,4 @@ obj
 *.user
 App_Data/*.json
 App_Data/*.json
+.claude
