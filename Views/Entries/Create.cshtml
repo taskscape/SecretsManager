@@ -3,28 +3,44 @@
     ViewData["Title"] = "New Entry";
 }
 
-<div class="panel">
-    <h1>New Entry</h1>
+<div class="page-heading">
+    <div>
+        <h1>New entry</h1>
+        <p class="subtitle">Store a new secret in your vault</p>
+    </div>
+    <a class="btn btn-ghost" asp-action="Index">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Back
+    </a>
+</div>
 
+<div class="card">
     <form method="post" asp-action="Create">
         @Html.AntiForgeryToken()
         <div class="field">
             <label asp-for="Title">Entry title</label>
-            <input asp-for="Title" />
-            <span class="validation" asp-validation-for="Title"></span>
+            <input asp-for="Title" placeholder="e.g. GitHub, AWS, Database…" />
+            <span class="validation-msg" asp-validation-for="Title"></span>
         </div>
         <div class="field">
             <label asp-for="Details">Entry details</label>
-            <textarea asp-for="Details" rows="10"></textarea>
+            <textarea asp-for="Details" rows="10" placeholder="Paste passwords, keys, notes, or any sensitive content here…"></textarea>
         </div>
         <div class="field">
-            <label asp-for="Users">Visible to (optional)</label>
+            <label asp-for="Users">Visible to <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--color-muted)">(optional)</span></label>
             <input asp-for="Users" placeholder="* for all, or comma-separated usernames" />
-            <span class="hint">Leave empty for default access, use "*" for all users, or list usernames separated by commas</span>
+            <span class="field-hint">Leave empty for default access, use <code>*</code> for all users, or list usernames separated by commas.</span>
         </div>
-        <div class="actions">
-            <button type="submit" class="primary">Create</button>
-            <a asp-action="Index">Cancel</a>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Create entry
+            </button>
+            <a class="btn btn-ghost" asp-action="Index">Cancel</a>
         </div>
     </form>
 </div>
