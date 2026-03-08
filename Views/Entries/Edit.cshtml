@@ -32,7 +32,7 @@
         <div class="field">
             <label asp-for="Users">Visible to <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--color-muted)">(optional)</span></label>
             <input asp-for="Users" placeholder="* for all, or comma-separated usernames" />
-            <span class="field-hint">Leave empty for default access, use <code>*</code> for all users, or list usernames separated by commas.</span>
+            <span class="field-hint">Leave empty to keep private (only you can read it). Use <code>*</code> to share with all users, or list specific usernames separated by commas.</span>
         </div>
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">
