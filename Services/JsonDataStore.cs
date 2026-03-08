@@ -16,11 +16,6 @@ public class JsonDataStore
         PropertyNameCaseInsensitive = true
     };
 
-    private static readonly JsonSerializerOptions _readOptions = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
-
     public JsonDataStore(IHostEnvironment env)
     {
         var dataDir = Path.Combine(env.ContentRootPath, "App_Data");
@@ -434,23 +429,7 @@ public class JsonDataStore
 
     private void EnsureSeedData()
     {
-        var users        = Load<List<User>>(_usersPath) ?? new List<User>();
-        var usersUpdated = false;
-
-        void EnsureUser(string username, string password, bool isAdmin = false)
-        {
-            if (!users.Any(u => u.Username == username))
-            {
-                users.Add(new User { Username = username, Password = password, IsAdmin = isAdmin });
-                usersUpdated = true;
-            }
-        }
-
-        EnsureUser("admin", "admin123", isAdmin: true);
-        EnsureUser("test", "test");
-
-        if (!File.Exists(_usersPath) || usersUpdated)
-            Save(_usersPath, users);
+        // Users are managed exclusively via users.json — no automatic creation here.
 
         if (!File.Exists(_entriesPath))
         {
