@@ -1,0 +1,81 @@
+@model IReadOnlyList<AccessRequestViewModel>
+@{
+    ViewData["Title"] = "Access Requests";
+}
+
+<div class="page-heading">
+    <div>
+        <h1>Access requests</h1>
+        <p class="subtitle">
+            @if (Model.Count == 0)
+            {
+                <span>No pending requests</span>
+            }
+            else
+            {
+                <span>@Model.Count pending request@(Model.Count == 1 ? "" : "s") for your entries</span>
+            }
+        </p>
+    </div>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="empty-state">
+        <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+        </div>
+        <h3>All clear</h3>
+        <p>No pending access requests for your entries.</p>
+    </div>
+}
+else
+{
+    <div class="requests-list">
+        @foreach (var item in Model)
+        {
+            <div class="request-card">
+                <div class="request-card-body">
+                    <div class="request-who">
+                        <div class="request-avatar">@item.Request.RequestedBy[0].ToString().ToUpper()</div>
+                        <div>
+                            <div class="request-username">@item.Request.RequestedBy</div>
+                            <div class="request-meta">
+                                requested access to
+                                <a asp-controller="Entries" asp-action="Details" asp-route-id="@item.Request.EntryId">
+                                    @item.EntryTitle
+                                </a>
+                            </div>
+                            <div class="request-time">
+                                @item.Request.RequestedAtUtc.ToString("yyyy-MM-dd HH:mm") UTC
+                            </div>
+                        </div>
+                    </div>
+                    <div class="request-actions">
+                        <form method="post" asp-controller="Requests" asp-action="Approve" asp-route-id="@item.Request.Id" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                Approve
+                            </button>
+                        </form>
+                        <form method="post" asp-controller="Requests" asp-action="Decline" asp-route-id="@item.Request.Id" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-danger btn-sm">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                                Decline
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -1,8 +1,10 @@
 @inject IHttpContextAccessor HttpContextAccessor
+@inject Passwords.Services.JsonDataStore DataStore
 @{
     var user = HttpContextAccessor.HttpContext?.Session.GetString("username");
     var isLoggedIn = !string.IsNullOrEmpty(user);
     var avatarLetter = isLoggedIn ? user![0].ToString().ToUpper() : "";
+    var pendingCount = isLoggedIn ? DataStore.GetPendingRequestCountForOwner(user!) : 0;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -70,12 +72,30 @@
 
             <div class="sidebar-footer">
                 <div class="sidebar-user">
-                    <div class="sidebar-avatar">@avatarLetter</div>
+                    <div class="sidebar-avatar-wrap">
+                        <div class="sidebar-avatar">@avatarLetter</div>
+                        @if (pendingCount > 0)
+                        {
+                            <span class="notif-dot" title="@pendingCount pending access request(s)">
+                                @(pendingCount > 9 ? "9+" : pendingCount.ToString())
+                            </span>
+                        }
+                    </div>
                     <div>
                         <div class="sidebar-username">@user</div>
                         <div class="sidebar-username-label">Signed in</div>
                     </div>
                 </div>
+                @if (pendingCount > 0)
+                {
+                    <a class="sidebar-requests-link" asp-controller="Requests" asp-action="Index">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        @pendingCount pending request@(pendingCount == 1 ? "" : "s")
+                    </a>
+                }
                 <form method="post" asp-controller="Account" asp-action="Logout">
                     @Html.AntiForgeryToken()
                     <button type="submit" class="link-button">

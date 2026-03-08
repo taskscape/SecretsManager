@@ -16,46 +16,50 @@ public class EntriesController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        if (!IsLoggedIn)
-        {
-            return RedirectToLogin();
-        }
+        if (!IsLoggedIn) return RedirectToLogin();
 
-        var currentUser = CurrentUser;
-        var entries = _store.GetEntries()
-            .Where(e => IsVisibleToUser(e, currentUser))
+        var currentUser = _store.GetUser(CurrentUser);
+        var items = _store.GetEntries()
             .OrderBy(e => e.Title, StringComparer.OrdinalIgnoreCase)
+            .Select(e => new EntryListItemViewModel
+            {
+                Entry   = e,
+                CanRead = _store.CanUserReadEntry(e, currentUser)
+            })
             .ToList();
 
-        return View(entries);
+        return View(items);
     }
 
     [HttpGet]
     public IActionResult Details(int id)
     {
-        if (!IsLoggedIn)
-        {
-            return RedirectToLogin();
-        }
+        if (!IsLoggedIn) return RedirectToLogin();
 
         var entry = _store.GetEntry(id);
-        if (entry == null)
-        {
-            return NotFound();
-        }
+        if (entry == null) return NotFound();
 
-        _store.LogEntryOpened(CurrentUser, entry);
-        return View(entry);
+        var currentUser = _store.GetUser(CurrentUser);
+        var canRead     = _store.CanUserReadEntry(entry, currentUser);
+
+        if (canRead)
+            _store.LogEntryOpened(CurrentUser, entry);
+
+        var vm = new EntryDetailsViewModel
+        {
+            Entry             = entry,
+            CanRead           = canRead,
+            HasPendingRequest = !canRead && _store.HasPendingRequest(CurrentUser, id),
+            OwnerUsername     = entry.CreatedBy
+        };
+
+        return View(vm);
     }
 
     [HttpGet]
     public IActionResult Create()
     {
-        if (!IsLoggedIn)
-        {
-            return RedirectToLogin();
-        }
-
+        if (!IsLoggedIn) return RedirectToLogin();
         return View(new EntryCreateViewModel());
     }
 
@@ -63,10 +67,7 @@ public class EntriesController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Create(EntryCreateViewModel model)
     {
-        if (!IsLoggedIn)
-        {
-            return RedirectToLogin();
-        }
+        if (!IsLoggedIn) return RedirectToLogin();
 
         if (string.IsNullOrWhiteSpace(model.Title))
         {
@@ -75,8 +76,8 @@ public class EntriesController : Controller
         }
 
         var entry = _store.AddEntry(
-            model.Title.Trim(), 
-            model.Details ?? string.Empty, 
+            model.Title.Trim(),
+            model.Details ?? string.Empty,
             string.IsNullOrWhiteSpace(model.Users) ? null : model.Users.Trim(),
             CurrentUser);
         return RedirectToAction("Details", new { id = entry.Id });
@@ -85,23 +86,20 @@ public class EntriesController : Controller
     [HttpGet]
     public IActionResult Edit(int id)
     {
-        if (!IsLoggedIn)
-        {
-            return RedirectToLogin();
-        }
+        if (!IsLoggedIn) return RedirectToLogin();
 
         var entry = _store.GetEntry(id);
-        if (entry == null)
-        {
-            return NotFound();
-        }
+        if (entry == null) return NotFound();
+
+        var currentUser = _store.GetUser(CurrentUser);
+        if (!_store.CanUserReadEntry(entry, currentUser)) return Forbid();
 
         var model = new EntryEditViewModel
         {
-            Id = entry.Id,
-            Title = entry.Title,
+            Id      = entry.Id,
+            Title   = entry.Title,
             Details = entry.Details,
-            Users = entry.Users
+            Users   = entry.Users
         };
 
         return View(model);
@@ -111,10 +109,7 @@ public class EntriesController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Edit(EntryEditViewModel model)
     {
-        if (!IsLoggedIn)
-        {
-            return RedirectToLogin();
-        }
+        if (!IsLoggedIn) return RedirectToLogin();
 
         if (string.IsNullOrWhiteSpace(model.Title))
         {
@@ -122,44 +117,40 @@ public class EntriesController : Controller
             return View(model);
         }
 
+        var entry = _store.GetEntry(model.Id);
+        if (entry == null) return NotFound();
+        var currentUser = _store.GetUser(CurrentUser);
+        if (!_store.CanUserReadEntry(entry, currentUser)) return Forbid();
+
         var updated = _store.UpdateEntry(
-            model.Id, 
-            model.Title.Trim(), 
-            model.Details ?? string.Empty, 
+            model.Id,
+            model.Title.Trim(),
+            model.Details ?? string.Empty,
             string.IsNullOrWhiteSpace(model.Users) ? null : model.Users.Trim(),
             CurrentUser);
-        if (!updated)
-        {
-            return NotFound();
-        }
+        if (!updated) return NotFound();
 
         return RedirectToAction("Details", new { id = model.Id });
     }
 
-    private string CurrentUser => HttpContext.Session.GetString("username") ?? "";
-
-    private bool IsLoggedIn => !string.IsNullOrEmpty(CurrentUser);
-
-    private IActionResult RedirectToLogin() => RedirectToAction("Login", "Account");
-
-    private static bool IsVisibleToUser(Entry entry, string currentUser)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult RequestAccess(int id)
     {
-        if (string.IsNullOrWhiteSpace(entry.Users))
-        {
-            return true;
-        }
+        if (!IsLoggedIn) return RedirectToLogin();
 
-        var users = entry.Users.Trim();
+        var entry = _store.GetEntry(id);
+        if (entry == null) return NotFound();
 
-        if (users == "*")
-        {
-            return true;
-        }
+        var currentUser = _store.GetUser(CurrentUser);
+        if (_store.CanUserReadEntry(entry, currentUser))
+            return RedirectToAction("Details", new { id });
 
-        var allowedUsers = users.Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .Select(u => u.Trim())
-            .ToList();
-
-        return allowedUsers.Any(u => string.Equals(u, currentUser, StringComparison.OrdinalIgnoreCase));
+        _store.CreateAccessRequest(CurrentUser, id);
+        return RedirectToAction("Details", new { id });
     }
+
+    private string CurrentUser => HttpContext.Session.GetString("username") ?? "";
+    private bool IsLoggedIn    => !string.IsNullOrEmpty(CurrentUser);
+    private IActionResult RedirectToLogin() => RedirectToAction("Login", "Account");
 }

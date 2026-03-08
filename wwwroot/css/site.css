@@ -682,6 +682,237 @@ textarea {
 }
 
 /* ============================================================
+   Locked entry states (Index + Details)
+   ============================================================ */
+.entry-item--locked {
+    opacity: 0.65;
+}
+
+.entry-item--locked:hover {
+    border-color: var(--color-border);
+    background: var(--color-surface);
+    box-shadow: none;
+}
+
+.entry-icon--locked {
+    background: rgba(100,116,139,0.12);
+    color: var(--color-muted);
+    fill: var(--color-muted);
+}
+
+.entry-title--locked {
+    color: var(--color-text-dim);
+}
+
+.entry-meta--locked {
+    color: var(--color-muted);
+    font-style: italic;
+}
+
+.detail-header-icon--locked {
+    background: rgba(100,116,139,0.12);
+    color: var(--color-muted);
+    fill: var(--color-muted);
+}
+
+/* ============================================================
+   Access denied box (Details view)
+   ============================================================ */
+.access-denied-box {
+    display: flex;
+    gap: 18px;
+    padding: 8px 0;
+    align-items: flex-start;
+}
+
+.access-denied-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    background: rgba(100,116,139,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    fill: var(--color-muted);
+}
+
+.access-denied-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.access-denied-content h3 {
+    font-size: 1rem;
+    margin-bottom: 6px;
+    color: var(--color-text);
+}
+
+.access-denied-content p {
+    font-size: 14px;
+    color: var(--color-text-dim);
+    margin: 0;
+}
+
+.access-requested-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 10px 14px;
+    background: var(--color-accent-dim);
+    border: 1px solid rgba(99,102,241,0.3);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--color-accent-h);
+}
+
+.access-requested-notice svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   Sidebar notification badge + requests link
+   ============================================================ */
+.sidebar-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.notif-dot {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    background: var(--color-danger);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-surface);
+    line-height: 1;
+}
+
+.sidebar-requests-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    background: var(--color-danger-dim);
+    border: 1px solid var(--color-danger-border);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-danger);
+    text-decoration: none !important;
+    transition: background var(--transition), color var(--transition);
+}
+
+.sidebar-requests-link:hover {
+    background: rgba(239,68,68,0.2);
+    color: #ff6b6b;
+}
+
+.sidebar-requests-link svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   Access requests page
+   ============================================================ */
+.requests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.request-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.request-card-body {
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.request-who {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+.request-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--color-accent-dim);
+    color: var(--color-accent-h);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.request-username {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-text);
+}
+
+.request-meta {
+    font-size: 13px;
+    color: var(--color-text-dim);
+    margin-top: 2px;
+}
+
+.request-meta a {
+    color: var(--color-accent-h);
+    font-weight: 500;
+}
+
+.request-meta a:hover { color: #fff; }
+
+.request-time {
+    font-size: 11px;
+    color: var(--color-muted);
+    margin-top: 4px;
+    font-family: var(--font-mono);
+}
+
+.request-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+.btn-sm {
+    padding: 7px 14px;
+    font-size: 13px;
+}
+
+/* ============================================================
    History section (Details view)
    ============================================================ */
 .history-section {
