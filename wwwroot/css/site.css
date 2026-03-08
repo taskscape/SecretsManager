@@ -682,6 +682,147 @@ textarea {
 }
 
 /* ============================================================
+   History section (Details view)
+   ============================================================ */
+.history-section {
+    margin-top: 1.5rem;
+}
+
+.history-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 14px 20px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-dim);
+    list-style: none;
+    transition: background var(--transition), color var(--transition);
+    user-select: none;
+}
+
+.history-toggle:hover {
+    background: var(--color-surface-2);
+    color: var(--color-text);
+}
+
+.history-toggle::-webkit-details-marker { display: none; }
+
+details[open] .history-toggle {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.history-toggle .chevron {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    transition: transform var(--transition);
+}
+
+details[open] .history-toggle .chevron {
+    transform: rotate(90deg);
+}
+
+.history-count {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    padding: 2px 9px;
+    color: var(--color-muted);
+}
+
+.history-timeline {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-top: none;
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    overflow: hidden;
+}
+
+.history-entry {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.history-entry:last-child {
+    border-bottom: none;
+}
+
+.history-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.history-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-muted);
+}
+
+.history-badge svg {
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
+}
+
+.history-badge.newest {
+    background: var(--color-accent-dim);
+    border-color: rgba(99,102,241,0.3);
+    color: var(--color-accent-h);
+}
+
+.history-badge.pre-history {
+    font-style: italic;
+}
+
+.history-title-change {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--color-muted);
+    margin-bottom: 8px;
+}
+
+.history-title-change strong {
+    color: var(--color-text-dim);
+}
+
+.history-details-preview {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--color-text-dim);
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 140px;
+    overflow-y: auto;
+    margin: 0;
+}
+
+/* ============================================================
    Login page
    ============================================================ */
 .login-shell {

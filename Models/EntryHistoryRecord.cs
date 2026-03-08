@@ -1,10 +1,10 @@
 namespace Passwords.Models;
 
-public class Entry
+public class EntryHistoryRecord
 {
-    public int Id { get; set; }
+    public DateTime ChangedAtUtc { get; set; }
+    public string ChangedBy { get; set; } = "";
     public string Title { get; set; } = "";
     public string Details { get; set; } = "";
     public string? Users { get; set; }
-    public List<EntryHistoryRecord> History { get; set; } = new();
 }
