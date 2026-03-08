@@ -16,6 +16,11 @@ public class JsonDataStore
         PropertyNameCaseInsensitive = true
     };
 
+    private static readonly JsonSerializerOptions _readOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     public JsonDataStore(IHostEnvironment env)
     {
         var dataDir = Path.Combine(env.ContentRootPath, "App_Data");
