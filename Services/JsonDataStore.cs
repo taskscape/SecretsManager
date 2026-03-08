@@ -10,6 +10,11 @@ public class JsonDataStore
     private readonly string _entriesPath;
     private readonly string _accessPath;
 
+    private static readonly JsonSerializerOptions _readOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     public JsonDataStore(IHostEnvironment env)
     {
         var dataDir = Path.Combine(env.ContentRootPath, "App_Data");
@@ -20,6 +25,7 @@ public class JsonDataStore
         _accessPath = Path.Combine(dataDir, "access.json");
 
         EnsureSeedData();
+        MigrateEntries();
     }
 
     public bool ValidateUser(string username, string password)
@@ -60,19 +66,31 @@ public class JsonDataStore
         {
             var entries = Load<List<Entry>>(_entriesPath) ?? new List<Entry>();
             var nextId = entries.Count == 0 ? 1 : entries.Max(e => e.Id) + 1;
+            var now = DateTime.UtcNow;
             var entry = new Entry
             {
                 Id = nextId,
                 Title = title,
                 Details = details,
-                Users = users
+                Users = users,
+                History = new List<EntryHistoryRecord>
+                {
+                    new EntryHistoryRecord
+                    {
+                        ChangedAtUtc = now,
+                        ChangedBy = user,
+                        Title = title,
+                        Details = details,
+                        Users = users
+                    }
+                }
             };
 
             entries.Add(entry);
             Save(_entriesPath, entries);
             LogAccess(new AccessLogEntry
             {
-                TimestampUtc = DateTime.UtcNow,
+                TimestampUtc = now,
                 User = user,
                 Action = "CreateEntry",
                 EntryId = entry.Id,
@@ -99,13 +117,24 @@ public class JsonDataStore
                 return false;
             }
 
+            var now = DateTime.UtcNow;
+            entry.History ??= new List<EntryHistoryRecord>();
+            entry.History.Add(new EntryHistoryRecord
+            {
+                ChangedAtUtc = now,
+                ChangedBy = user,
+                Title = title,
+                Details = details,
+                Users = users
+            });
+
             entry.Title = title;
             entry.Details = details;
             entry.Users = users;
             Save(_entriesPath, entries);
             LogAccess(new AccessLogEntry
             {
-                TimestampUtc = DateTime.UtcNow,
+                TimestampUtc = now,
                 User = user,
                 Action = "UpdateEntry",
                 EntryId = entry.Id,
@@ -151,6 +180,46 @@ public class JsonDataStore
         Save(_accessPath, logs);
     }
 
+    /// <summary>
+    /// Backwards-compatible migration: entries that pre-date history tracking get a single
+    /// synthetic history record seeded from their current field values.
+    /// </summary>
+    private void MigrateEntries()
+    {
+        lock (_lock)
+        {
+            if (!File.Exists(_entriesPath)) return;
+
+            var entries = Load<List<Entry>>(_entriesPath) ?? new List<Entry>();
+            var migrated = false;
+
+            foreach (var entry in entries)
+            {
+                if (entry.History == null || entry.History.Count == 0)
+                {
+                    entry.History = new List<EntryHistoryRecord>
+                    {
+                        new EntryHistoryRecord
+                        {
+                            // DateTime.MinValue signals this record predates history tracking
+                            ChangedAtUtc = DateTime.MinValue,
+                            ChangedBy = "(pre-history)",
+                            Title = entry.Title,
+                            Details = entry.Details,
+                            Users = entry.Users
+                        }
+                    };
+                    migrated = true;
+                }
+            }
+
+            if (migrated)
+            {
+                Save(_entriesPath, entries);
+            }
+        }
+    }
+
     private void EnsureSeedData()
     {
         var users = Load<List<User>>(_usersPath) ?? new List<User>();
@@ -175,13 +244,24 @@ public class JsonDataStore
 
         if (!File.Exists(_entriesPath))
         {
+            var now = DateTime.UtcNow;
             var entries = new List<Entry>
             {
                 new Entry
                 {
                     Id = 1,
                     Title = "First Entry",
-                    Details = "Replace this with real data."
+                    Details = "Replace this with real data.",
+                    History = new List<EntryHistoryRecord>
+                    {
+                        new EntryHistoryRecord
+                        {
+                            ChangedAtUtc = now,
+                            ChangedBy = "system",
+                            Title = "First Entry",
+                            Details = "Replace this with real data."
+                        }
+                    }
                 }
             };
             Save(_entriesPath, entries);
@@ -206,7 +286,7 @@ public class JsonDataStore
             return default;
         }
 
-        return JsonSerializer.Deserialize<T>(json);
+        return JsonSerializer.Deserialize<T>(json, _readOptions);
     }
 
     private static void Save<T>(string path, T data)
